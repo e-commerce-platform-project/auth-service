@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.ActivateUserRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.CreateUserRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.LoginRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RefreshTokenRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.service.AuthService;
 import ru.ivanov.ecommerceplatformproject.authservice.service.KeycloakService;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
@@ -133,5 +135,16 @@ public class AuthServiceImpl implements AuthService {
 //
 //                    refreshTokenService.revokeToken(refreshToken.getToken());
 //                });
+    }
+
+    @Override
+    public ApiTokenResponse refreshToken(String refreshToken) {
+        return keycloakService.refreshToken(refreshToken);
+    }
+
+    @Override
+    public ApiTokenResponse activateUser(ActivateUserRequest request) {
+        keycloakService.activateUser(request.keycloakUserId());
+        return null;
     }
 }

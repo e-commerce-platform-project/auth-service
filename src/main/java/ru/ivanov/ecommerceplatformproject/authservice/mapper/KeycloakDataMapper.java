@@ -6,7 +6,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ap.shaded.freemarker.template.utility.CollectionUtils;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.CreateUserRequest;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,7 @@ public interface KeycloakDataMapper {
 
         user.setClientRoles(new HashMap<>());//todo узнать
         List<String> realmRoles = user.getRealmRoles();//todo
-        user.setRealmRoles(CollectionUtils.isNotEmpty(realmRoles) ? realmRoles : Collections.emptyList());//todo
+//        user.setRealmRoles(CollectionUtils.isNotEmpty(realmRoles) ? realmRoles : Collections.emptyList());//todo
 
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);

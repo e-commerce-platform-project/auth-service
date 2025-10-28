@@ -1,9 +1,10 @@
 package ru.ivanov.ecommerceplatformproject.authservice.service;
 
+import jakarta.validation.Valid;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.ActivateUserRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.CreateUserRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.LoginRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.response.AuthSellerResponse;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.request.SellerRegistrationRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RefreshTokenRequest;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiTokenResponse;
 
@@ -20,4 +21,8 @@ public interface AuthService {
 //    JwtResponse refreshSeller(RefreshTokenRequest request);
 
     void logout(String refreshToken);
+
+    ApiTokenResponse refreshToken(String refreshToken);
+
+    ApiTokenResponse activateUser(ActivateUserRequest request);
 }

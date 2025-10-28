@@ -8,4 +8,8 @@ public interface KeycloakService {
     void createUser(CreateUserRequest request);
 
     ApiTokenResponse loginUser(LoginRequest request);
+
+    ApiTokenResponse activateUser(String keycloakUserId);
+
+    ApiTokenResponse refreshToken(String request);
 }

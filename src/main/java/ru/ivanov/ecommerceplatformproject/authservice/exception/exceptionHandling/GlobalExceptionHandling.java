@@ -1,6 +1,5 @@
 package ru.ivanov.ecommerceplatformproject.authservice.exception.exceptionHandling;
 
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,27 +10,28 @@ import ru.ivanov.ecommerceplatformproject.authservice.exception.UsernameIsTakenE
 
 import java.time.LocalDateTime;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @RestControllerAdvice
 public class GlobalExceptionHandling {
 
-    @ExceptionHandler(JwtException.class)
-    public ResponseEntity<ru.ivanov.ecommerceplatformproject.authservice.dto.response.ErrorResponse> handleJwtException(
-            JwtException ex,
-            HttpServletRequest request
-    ) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                request.getRequestURI(),
-                ex.getMessage(),
-                UNAUTHORIZED.value(),
-                LocalDateTime.now()
-        );
-        return ResponseEntity
-                .status(UNAUTHORIZED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(errorResponse);
-    }
+//    @ExceptionHandler(JwtException.class)
+//    public ResponseEntity<ru.ivanov.ecommerceplatformproject.authservice.dto.response.ErrorResponse> handleJwtException(
+//            JwtException ex,
+//            HttpServletRequest request
+//    ) {
+//        ErrorResponse errorResponse = new ErrorResponse(
+//                request.getRequestURI(),
+//                ex.getMessage(),
+//                UNAUTHORIZED.value(),
+//                LocalDateTime.now()
+//        );
+//        return ResponseEntity
+//                .status(UNAUTHORIZED)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(errorResponse);
+//    }
 
     @ExceptionHandler(UsernameIsTakenException.class)
     public ResponseEntity<ErrorResponse> handleJwtException(

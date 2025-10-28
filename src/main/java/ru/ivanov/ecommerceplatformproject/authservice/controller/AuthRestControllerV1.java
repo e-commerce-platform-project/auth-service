@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.CreateUserRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.LoginRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.LogoutRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RefreshTokenRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.*;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.response.AuthSellerResponse;
 import ru.ivanov.ecommerceplatformproject.authservice.service.AuthService;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.request.SellerRegistrationRequest;
@@ -39,11 +36,16 @@ public class AuthRestControllerV1 {
     }
 
 
-    @PostMapping("/refresh")
+    @PostMapping("/users/refresh")
     @ResponseStatus(HttpStatus.OK)
     public ApiTokenResponse refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-//        return authService.refreshToken();
-        return null;
+        return authService.refreshToken(request);
+    }
+
+    @PostMapping("/users/activate")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiTokenResponse activateUser(@Valid @RequestBody ActivateUserRequest request) {
+        return authService.activateUser(request);
     }
 
 
