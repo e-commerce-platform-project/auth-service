@@ -2,35 +2,59 @@ package ru.ivanov.ecommerceplatformproject.authservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.RegisteredUserDto;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.ActivateUserRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.CreateUserRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RegisterUserRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.LoginRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RefreshTokenRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.ResendVerificationCodeRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.kafka.KafkaProducer;
+import ru.ivanov.ecommerceplatformproject.authservice.mapper.KeycloakDataMapper;
 import ru.ivanov.ecommerceplatformproject.authservice.service.AuthService;
 import ru.ivanov.ecommerceplatformproject.authservice.service.KeycloakService;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiTokenResponse;
+import ru.ivanov.ecommerceplatformproject.sharedlibs.event.UserRegisteredEvent;
+
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-//    private final RefreshTokenService refreshTokenService;
-//    private final UserClient userClient;
-//    private final JWTUtils jwtUtils;
-//    private final UserDtoMapper userDtoMapper;
-//    private final SellerClient sellerClient;
-    private KeycloakService keycloakService;
+    private final KeycloakService keycloakService;
+    private final KeycloakDataMapper keycloakDataMapper;
+    private final KafkaProducer kafkaProducer;
 
     @Override
-    @Transactional
-    public ApiResponse createUser(CreateUserRequest request) {
-        keycloakService.createUser(request);
+    public ApiResponse registerUser(RegisterUserRequest request) {
+        UserRepresentation keycloakUser = keycloakDataMapper.toKeycloakUser(request);
+        RegisteredUserDto registeredUser = keycloakService.createUser(keycloakUser);
+
+        String verificationCode = generateVerificationCode();
+        UserRegisteredEvent event = UserRegisteredEvent.builder()
+                .userId(registeredUser.userId())
+                .firstName(registeredUser.firstName())
+                .lastName(registeredUser.lastName())
+                .email(registeredUser.email())
+                .verificationCode(verificationCode)
+                .build();
+
+        kafkaProducer.sendUserRegisteredEvent(event);
         return ApiResponse
-                .success("Verification code sent");
+                .success("User registered successfully");
+    }
+
+    private String generateVerificationCode() {
+        StringBuilder code = new StringBuilder();
+        Random random = ThreadLocalRandom.current();
+        IntStream.range(0, 6).forEach(i -> code.append(code.append(random.nextInt(10))));
+        return code.toString();
     }
 
     @Override
@@ -38,103 +62,11 @@ public class AuthServiceImpl implements AuthService {
         return keycloakService.loginUser(request);
     }
 
-//    @Override
-//    @Transactional
-//    public AuthSellerResponse registerSeller(SellerRegistrationRequest request) {
-//        SellerDto createdSeller = sellerClient.createSeller(request);
-//
-//        String accessToken = jwtUtils.generateAccessToken(createdSeller);
-//        RefreshToken refreshToken = jwtUtils.generateRefreshToken(createdSeller);
-//
-//        refreshTokenService.save(refreshToken);
-//        return new AuthSellerResponse(createdSeller, accessToken, refreshToken.getToken());
-//    }
-
-//    @Override
-//    @Transactional
-//    public AuthUserResponse loginUser(LoginRequest request) {
-//        UserDto userDto = userClient.verifyCredentials(request);
-//
-//        String accessToken = jwtUtils.generateAccessToken(userDto);
-//        RefreshToken refreshToken = jwtUtils.generateRefreshToken(userDto);
-//
-//        refreshTokenService.revokeAllTokensById(userDto.id());
-//        refreshTokenService.save(refreshToken);
-//
-//        return new AuthUserResponse(userDto, accessToken, refreshToken.getToken());
-//    }
-
-//    @Override
-//    @Transactional
-//    public AuthSellerResponse loginSeller(LoginRequest request) {
-//        SellerDto sellerDto = sellerClient.verifyCredentials(request);
-//
-//        String accessToken = jwtUtils.generateAccessToken(sellerDto);
-//        RefreshToken refreshToken = jwtUtils.generateRefreshToken(sellerDto);
-//
-//        refreshTokenService.revokeAllTokensById(userDto.id());
-//        refreshTokenService.save(refreshToken);
-//        return new AuthSellerResponse(sellerDto, accessToken, refreshToken.getToken());
-//    }
-
-//    @Override
-//    @Transactional
-//    public JwtResponse refreshUser(RefreshTokenRequest request) {
-//        String oldRefreshToken = request.refreshToken();
-//
-//        RefreshTokenStatus status = refreshTokenService.getTokenStatus(oldRefreshToken);
-//
-//        if (status != RefreshTokenStatus.ACTIVE) {
-//            throw new AuthException("Недействительный токен. Статус токена: " + status.name());
-//        }
-//
-//        UUID userId = jwtUtils.validateRefreshTokenAndExtractSubjectId(oldRefreshToken);
-//
-//        UserDto userDto = userClient.getUserById(userId);
-//
-//        String newAccessToken = jwtUtils.generateAccessToken(userDto);
-//        RefreshToken newRefreshToken = jwtUtils.generateRefreshToken(userDto);
-//
-//        refreshTokenService.rotateToken(oldRefreshToken, newRefreshToken);
-//
-//        return new JwtResponse(newAccessToken, newRefreshToken.getToken());
-//    }
-
-//    @Override
-//    @Transactional
-//    public JwtResponse refreshSeller(RefreshTokenRequest request) {
-//        String oldRefreshToken = request.refreshToken();
-//
-//        RefreshTokenStatus status = refreshTokenService.getTokenStatus(oldRefreshToken);
-//
-//        if (status != RefreshTokenStatus.ACTIVE) {
-//            throw new AuthException("Недействительный токен. Статус токена: " + status.name());
-//        }
-//
-//        UUID sellerId = jwtUtils.validateRefreshTokenAndExtractSubjectId(oldRefreshToken);
-//
-//        SellerDto userDto = sellerClient.getSellerById(sellerId);
-//
-//        String newAccessToken = jwtUtils.generateAccessToken(userDto);
-//        RefreshToken newRefreshToken = jwtUtils.generateRefreshToken(userDto);
-//
-//        refreshTokenService.rotateToken(oldRefreshToken, newRefreshToken);
-//
-//        return new JwtResponse(newAccessToken, newRefreshToken.getToken());
-//    }
-
 
     @Override
     @Transactional
     public void logout(String refreshToken) {
-//        refreshTokenService.findByToken(token)
-//                .ifPresent(refreshToken -> {
-//                    if (refreshToken.isRevoked()) {
-//                        return;
-//                    }
-//
-//                    refreshTokenService.revokeToken(refreshToken.getToken());
-//                });
+
     }
 
     @Override
@@ -144,7 +76,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ApiTokenResponse activateUser(ActivateUserRequest request) {
-        keycloakService.activateUser(request.keycloakUserId());
+        return keycloakService.activateUser(request.userId());
+    }
+
+    @Override
+    public ApiResponse resendVerificationCode(ResendVerificationCodeRequest request) {
+
         return null;
     }
 }

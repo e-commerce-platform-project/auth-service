@@ -13,30 +13,17 @@ application:
     adminPassword: admin
     adminClientId: admin-cli
 
-
 spring:
   application:
     name: auth-service
 
   kafka:
-    bootstrap-servers: localhost:29092
+    bootstrap-servers: localhost:29092, localhost:39092, localhost:49092
     producer:
       acks: all
     consumer:
       properties:
         spring.json.trusted.packages: "ru.ivanov.ecommerceplatformproject.sharedlibs.event*"
-
-#jwt:
-#  issuer: auth-service
-#  access:
-#    secret: 5ba1791dedb87fec844cd4c57bcf5c3afeb0379f4b67347a438bc559b429a52c
-#    ttl: 10s
-#  refresh:
-#    secret: 4cfa6d5afcaef760b96163d923c05a4d7c85957acbca06649d28b21576859f1c
-#    ttl: 1d
-#  service:
-#    secret: 057f34884f6434c80285a39344a5a47dfd3a571a0ca3e8a65768e76ffc6bb660
-#    ttl: 1m
 
 eureka:
   instance:
@@ -44,3 +31,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+kafka:
+  topics:
+    user-registered: user-registered-event-topic
