@@ -9,6 +9,7 @@ import ru.ivanov.ecommerceplatformproject.authservice.dto.request.*;
 import ru.ivanov.ecommerceplatformproject.authservice.service.AuthService;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiTokenResponse;
+import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.TokenResponse;
 
 @Slf4j
 @RestController
@@ -26,7 +27,7 @@ public class AuthRestControllerV1 {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public ApiTokenResponse loginUser(@Valid @RequestBody LoginRequest request) {
+    public TokenResponse loginUser(@Valid @RequestBody UserLoginReguest request) {
         return authService.loginUser(request);
     }
 
@@ -39,15 +40,15 @@ public class AuthRestControllerV1 {
     //todo восстановление доступа (изменить пароль)
 
 
-    @PostMapping("/users/refresh")
+    @PostMapping("/refresh-token")
     @ResponseStatus(HttpStatus.OK)
-    public ApiTokenResponse refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+    public TokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         return authService.refreshToken(request.refreshToken());
     }
 
     @PostMapping("/users/activate")
     @ResponseStatus(HttpStatus.OK)
-    public ApiTokenResponse activateUser(@Valid @RequestBody ActivateUserRequest request) {
+    public TokenResponse activateUser(@Valid @RequestBody ActivateUserRequest request) {
         return authService.activateUser(request);
     }
 

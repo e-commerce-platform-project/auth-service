@@ -13,14 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import ru.ivanov.ecommerceplatformproject.authservice.config.KeycloakClientConfig;
 import ru.ivanov.ecommerceplatformproject.authservice.config.KeycloakProperties;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.RegisteredUserDto;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.LoginRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.kafka.KafkaProducer;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.UserLoginReguest;
 import ru.ivanov.ecommerceplatformproject.authservice.service.KeycloakService;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiTokenResponse;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.event.UserRegisteredEvent;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +55,7 @@ public class KeycloakServiceImpl implements KeycloakService {
     }
 
     @Override
-    public ApiTokenResponse loginUser(LoginRequest request) {
+    public ApiTokenResponse loginUser(UserLoginReguest request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();

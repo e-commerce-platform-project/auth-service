@@ -2,7 +2,6 @@ package ru.ivanov.ecommerceplatformproject.authservice.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.ivanov.ecommerceplatformproject.authservice.service.RefreshTokenService;
 
 @Service
 @RequiredArgsConstructor

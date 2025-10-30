@@ -1,6 +1,6 @@
 package ru.ivanov.ecommerceplatformproject.authservice.dto.request;
 
-public record RefreshTokenRequest(
+public record TokenRefreshRequest(
         String refreshToken
 ) {
 }

@@ -1,23 +1,22 @@
 package ru.ivanov.ecommerceplatformproject.authservice.service;
 
-import jakarta.validation.Valid;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.ActivateUserRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RegisterUserRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.LoginRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.ResendVerificationCodeRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.UserLoginReguest;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiTokenResponse;
+import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.TokenResponse;
 
 public interface AuthService {
     ApiResponse registerUser(RegisterUserRequest request);
 
-    ApiTokenResponse loginUser(LoginRequest request);
+    TokenResponse loginUser(UserLoginReguest request);
 
     void logout(String refreshToken);
 
-    ApiTokenResponse refreshToken(String refreshToken);
+    TokenResponse refreshToken(String refreshToken);
 
-    ApiTokenResponse activateUser(ActivateUserRequest request);
+    TokenResponse activateUser(ActivateUserRequest request);
 
     ApiResponse resendVerificationCode(ResendVerificationCodeRequest request);
 }
