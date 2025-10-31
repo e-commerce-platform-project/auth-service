@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.*;
 import ru.ivanov.ecommerceplatformproject.authservice.service.AuthService;
+import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.request.VerifyEmailCodeRequest;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiTokenResponse;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.TokenResponse;
 
 @Slf4j
@@ -27,22 +27,30 @@ public class AuthRestControllerV1 {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public TokenResponse loginUser(@Valid @RequestBody UserLoginReguest request) {
+    public TokenResponse loginUser(@Valid @RequestBody UserLoginRequest request) {
         return authService.loginUser(request);
     }
 
+    @PostMapping("/verify-code")
+    @ResponseStatus(HttpStatus.OK)
+    public TokenResponse verifyEmailCode(VerifyEmailCodeRequest request) {
+        return authService.verifyEmailCode(request);
+    }
+
     @PostMapping("/resend-verification-code")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public ApiResponse resendVerificationCode(@Valid @RequestBody ResendVerificationCodeRequest request) {
         return authService.resendVerificationCode(request);
     }
 
 
-    //todo восстановление доступа (изменить пароль)
+
+
 
 
     @PostMapping("/refresh-token")
     @ResponseStatus(HttpStatus.OK)
-    public TokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+    public TokenResponse tokenRefresh(@Valid @RequestBody TokenRefreshRequest request) {
         return authService.refreshToken(request.refreshToken());
     }
 

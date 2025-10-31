@@ -6,9 +6,9 @@ application:
     serverUrl: ${KEYCLOAK_URL:http://localhost:8080}
     realmUrl: ${application.keycloak.serverUrl}/realms/${application.keycloak.realm}
     tokenUrl: ${application.keycloak.realmUrl}/protocol/openid-connect/token
-    realm: ecommerce-platform-project-realm
-    clientId: ecommerce-platform-project-realm
-    clientSecret:
+    realm: ecommerce-platform-project
+    clientId: auth-service
+    clientSecret: RFldp0ODcs0qPUgttZp0tKzVKgFRJPno
     adminUsername: admin
     adminPassword: admin
     adminClientId: admin-cli
@@ -16,6 +16,21 @@ application:
 spring:
   application:
     name: auth-service
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/ecommerce-platform-project
+            token-uri: http://localhost:8080/realms/ecommerce-platform-project/protocal/openid-connect/token
+
 
   kafka:
     bootstrap-servers: localhost:29092, localhost:39092, localhost:49092
@@ -26,12 +41,13 @@ spring:
         spring.json.trusted.packages: "ru.ivanov.ecommerceplatformproject.sharedlibs.event*"
 
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
+    healthcheck:
+      enabled: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
 kafka:
   topics:
     user-registered: user-registered-event-topic
+    verification-code-issued: verification-code-issued-event-topic

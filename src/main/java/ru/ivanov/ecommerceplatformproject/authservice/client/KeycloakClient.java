@@ -2,7 +2,6 @@ package ru.ivanov.ecommerceplatformproject.authservice.client;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.apache.el.parser.Token;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -12,7 +11,7 @@ import ru.ivanov.ecommerceplatformproject.authservice.config.KeycloakProperties;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.KeycloakUserRepresentation;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.RegisteredUserDto;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.TokenRefreshRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.UserLoginReguest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.UserLoginRequest;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.TokenResponse;
 
 @Component
@@ -35,12 +34,12 @@ public class KeycloakClient {
     }
 
 
-    public TokenResponse login(UserLoginReguest userLoginReguest) {
+    public TokenResponse login(UserLoginRequest userLoginRequest) {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-        formData.add("email", userLoginReguest.email());
-        formData.add("password", userLoginReguest.password());
+        formData.add("email", userLoginRequest.email());
+        formData.add("password", userLoginRequest.password());
         formData.add("client_id", keycloakProperties.clientId());
-        formData.add("grant_type", );
+        formData.add("grant_type", "");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -97,4 +96,7 @@ public class KeycloakClient {
 
     }
 
+    public boolean isEmailVerified(String email) {
+        return false;
+    }
 }
