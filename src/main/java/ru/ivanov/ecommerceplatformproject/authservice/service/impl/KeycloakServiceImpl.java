@@ -1,12 +1,18 @@
 package ru.ivanov.ecommerceplatformproject.authservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.metrics.stats.TokenBucket;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.ivanov.ecommerceplatformproject.authservice.client.KeycloakClient;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import ru.ivanov.ecommerceplatformproject.authservice.client.KeycloakAdminClient;
+import ru.ivanov.ecommerceplatformproject.authservice.client.KeycloakTokenClient;
 import ru.ivanov.ecommerceplatformproject.authservice.config.KeycloakProperties;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.RegisteredUserDto;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RegisterUserRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.response.TokenResponse;
 import ru.ivanov.ecommerceplatformproject.authservice.exception.KeycloakException;
 import ru.ivanov.ecommerceplatformproject.authservice.exception.KeycloakInvalidEmailException;
 import ru.ivanov.ecommerceplatformproject.authservice.exception.KeycloakInvalidPasswordException;
@@ -19,18 +25,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KeycloakServiceImpl implements KeycloakService {
 
     private final KeycloakProperties keycloakProperties;
-    private final KeycloakClient keycloakClient;
+    private final KeycloakAdminClient keycloakAdminClient;
+    private final KeycloakTokenClient keycloakTokenClient;
+
 
     @Override
     public RegisteredUserDto createUser(RegisterUserRequest request) {
         Map<String, Object> user = new HashMap<>();
         user.put("email", request.email());
-        user.put("firstName", request.lastName());
+        user.put("firstName", request.firstName());
+        user.put("lastName", request.lastName());
         user.put("enabled", true);
         user.put("emailVerified", false);
 
@@ -43,7 +53,7 @@ public class KeycloakServiceImpl implements KeycloakService {
         user.put("credentials", credentials);
 
         try {
-            ResponseEntity<Void> response = keycloakClient.createUser(user);
+            ResponseEntity<Void> response = keycloakAdminClient.createUser(user);
 
             String userId = extractUserIdFromLocation(response);//todo
 
@@ -65,40 +75,42 @@ public class KeycloakServiceImpl implements KeycloakService {
     }
 
     @Override
-    public Map<String, Object> login(String email, String password) {
-        Map<String, String> request = new HashMap<>();
-        request.put("grant_type", "password");
-        request.put("client_id", keycloakProperties.clientId());
-        request.put("client_secret", keycloakProperties.clientSecret());
-        request.put("email", email);
-        request.put("password", password);
+    public TokenResponse login(String email, String password) {
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("grant_type", "password");
+        request.add("client_id", keycloakProperties.clientId());
+        request.add("client_secret", keycloakProperties.clientSecret());
+        request.add("username", email);
+        request.add("password", password);
 
-        return keycloakClient.getToken(request); //todo обработка ошибок
+        Map<String, Object> tokens = keycloakTokenClient.getToken(request);
+        return TokenResponse.fromKeycloakResponse(tokens);
     }
 
     @Override
-    public Map<String, Object> refreshToken(String refreshToken) {
-        Map<String, String> request = new HashMap<>();
-        request.put("grant_type", refreshToken);
-        request.put("client_id", keycloakProperties.clientId());
-        request.put("client_secret", keycloakProperties.clientSecret());
-        request.put("refresh_token", refreshToken);
+    public TokenResponse refreshToken(String refreshToken) {
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("grant_type", "refresh_token");
+        request.add("client_id", keycloakProperties.clientId());
+        request.add("client_secret", keycloakProperties.clientSecret());
+        request.add("refresh_token", refreshToken);
 
-        return keycloakClient.getToken(request); //todo обработка ошибок
+        Map<String, Object> tokens = keycloakTokenClient.getToken(request);//todo обработка ошибок
+        return TokenResponse.fromKeycloakResponse(tokens);
     }
 
     @Override
     public void confirmEmail(String email) {
-        List<Map<String, Object>> users = keycloakClient.searchUsers(email);
+        List<Map<String, Object>> users = keycloakAdminClient.searchUsers(email);
         if (!users.isEmpty()) {
             String userId = (String) users.get(0).get("id");//todo
-            keycloakClient.updateUser(userId, Map.of("emailVerified", true));
+            keycloakAdminClient.updateUser(userId, Map.of("emailVerified", true));
         }
     }
 
     @Override
     public boolean isEmailVerified(String email) {
-        var users = keycloakClient.searchUsers(email);
+        var users = keycloakAdminClient.searchUsers(email);
         if (users.isEmpty()) {
             return false;
         }

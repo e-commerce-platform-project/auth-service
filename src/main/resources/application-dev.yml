@@ -20,17 +20,8 @@ spring:
       port: ${REDIS_PORT:6379}
 
 
-#  security:
-#    oauth2:
-#      client:
-#        provider:
-#          keycloak:
-#            issuer-uri: http://localhost:8080/realms/ecommerce-platform-project
-#            token-uri: http://localhost:8080/realms/ecommerce-platform-project/protocal/openid-connect/token
-
-
   kafka:
-    bootstrap-servers: localhost:29092, localhost:39092, localhost:49092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:39092,localhost:49092}
     producer:
       acks: all
     consumer:
@@ -44,9 +35,9 @@ eureka:
     healthcheck:
       enabled: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
 
 kafka:
   topics:
-    user-registered: user-registered-event-topic
-    verification-code-issued: verification-code-issued-event-topic
+    user-registered: ${KAFKA_USER_REGISTERED_TOPIC_NAME:user-registered-event-topic}
+    verification-code-issued: ${KAFKA_VERIFICATION_CODE_ISSUED_TOPIC_NAME:verification-code-issued-event-topic}

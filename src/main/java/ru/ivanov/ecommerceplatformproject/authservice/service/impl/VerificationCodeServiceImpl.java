@@ -3,9 +3,8 @@ package ru.ivanov.ecommerceplatformproject.authservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import ru.ivanov.ecommerceplatformproject.authservice.client.KeycloakClient;
+import ru.ivanov.ecommerceplatformproject.authservice.client.KeycloakAdminClient;
 import ru.ivanov.ecommerceplatformproject.authservice.service.VerificationCodeService;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     private final StringRedisTemplate redisTemplate;
-    private final KeycloakClient keycloakClient;
+    private final KeycloakAdminClient keycloakClient;
 
 
     @Override
@@ -27,7 +26,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
 
 
         String verificationCode = generateVerificationCode();
-        redisTemplate.opsForValue().set(email, verificationCode, 2, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(email, verificationCode, 5, TimeUnit.MINUTES);
         return verificationCode;
     }
 
@@ -40,7 +39,6 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     @Override
     public boolean isCodeValid(String email, String code) {
         String storedCode = redisTemplate.opsForValue().get(email);
-
         return storedCode != null && storedCode.equals(code);
     }
 

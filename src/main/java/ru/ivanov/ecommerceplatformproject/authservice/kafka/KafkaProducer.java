@@ -12,7 +12,6 @@ import java.util.UUID;
 
 @Component
 public class KafkaProducer {
-
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String userRegisteredTopic;
     private final String verificationCodeIssuedTopic;

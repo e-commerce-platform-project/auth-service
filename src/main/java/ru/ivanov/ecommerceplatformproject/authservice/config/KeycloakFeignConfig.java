@@ -27,7 +27,7 @@ public class KeycloakFeignConfig {
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
             if (requestTemplate.url().startsWith("/users")) {
-                String clientToken = getClientToken();
+                String clientToken = getServiceAccessToken();
                 requestTemplate.header(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + clientToken);
                 requestTemplate.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             }
@@ -39,7 +39,7 @@ public class KeycloakFeignConfig {
         return new KeycloakErrorDecoder();
     }
 
-    private String getClientToken() {
+    private String getServiceAccessToken() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -47,7 +47,6 @@ public class KeycloakFeignConfig {
         params.add("grant_type", "client_credentials");
         params.add("client_id", keycloakProperties.clientId());
         params.add("client_secret", keycloakProperties.clientSecret());
-        System.out.println(params);
 
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
 

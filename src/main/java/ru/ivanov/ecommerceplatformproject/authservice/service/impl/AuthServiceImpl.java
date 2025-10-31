@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.RegisteredUserDto;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RegisterUserRequest;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.VerifyEmailCodeRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.response.TokenResponse;
 import ru.ivanov.ecommerceplatformproject.authservice.kafka.KafkaProducer;
 import ru.ivanov.ecommerceplatformproject.authservice.service.AuthService;
 import ru.ivanov.ecommerceplatformproject.authservice.service.KeycloakService;
@@ -13,8 +14,6 @@ import ru.ivanov.ecommerceplatformproject.authservice.service.NotificationServic
 import ru.ivanov.ecommerceplatformproject.authservice.service.VerificationCodeService;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.event.UserRegisteredEvent;
-
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -46,12 +45,12 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public Map<String, Object> loginUser(String email, String password) {
+    public TokenResponse loginUser(String email, String password) {
         return keycloakService.login(email, password);
     }
 
     @Override
-    public Map<String, Object> refreshToken(String refreshToken) {
+    public TokenResponse refreshToken(String refreshToken) {
         return keycloakService.refreshToken(refreshToken);
     }
 
@@ -68,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Map<String, Object> verifyEmailCodeAndLogin(VerifyEmailCodeRequest request) {
+    public TokenResponse verifyEmailCodeAndLogin(VerifyEmailCodeRequest request) {
         if (!verificationCodeService.isCodeValid(request.email(), request.code())) {
             throw new IllegalArgumentException("invalid verification code");//todo
         }
