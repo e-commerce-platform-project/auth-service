@@ -3,8 +3,11 @@ package ru.ivanov.ecommerceplatformproject.authservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import ru.ivanov.ecommerceplatformproject.authservice.client.KeycloakClient;
 import ru.ivanov.ecommerceplatformproject.authservice.service.VerificationCodeService;
+import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -12,29 +15,41 @@ import java.util.concurrent.TimeUnit;
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     private final StringRedisTemplate redisTemplate;
+    private final KeycloakClient keycloakClient;
+
 
     @Override
-    public void saveCode(String email, String code) {
-        redisTemplate.opsForValue().set(email, code, 2, TimeUnit.MINUTES);
+    public String generateAndStoreCode(String email) {
+        var users = keycloakClient.searchUsers(email);
+        if (!users.isEmpty() && Boolean.TRUE.equals(users.get(0).get("emailVerified"))) {
+            throw new IllegalStateException("Email already verified");//todo
+        }
+
+
+        String verificationCode = generateVerificationCode();
+        redisTemplate.opsForValue().set(email, verificationCode, 2, TimeUnit.MINUTES);
+        return verificationCode;
     }
 
     @Override
-    public boolean verifyCode(String email, String code) {
+    public String generateNewCodeAndStore(String email) {
+        redisTemplate.delete(email);
+        return generateAndStoreCode(email);
+    }
+
+    @Override
+    public boolean isCodeValid(String email, String code) {
         String storedCode = redisTemplate.opsForValue().get(email);
 
-        if(storedCode != null && storedCode.equals(code)) {
-            redisTemplate.delete(email);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isCodeExists(String email) {
-        return redisTemplate.hasKey(email);
+        return storedCode != null && storedCode.equals(code);
     }
 
     @Override
-    public void updateCode(String email, String newCode) {
-        redisTemplate.opsForValue().set(email, newCode, 2, TimeUnit.MINUTES);
+    public void deleteCode(String email) {
+        redisTemplate.delete(email);
+    }
+
+    private String generateVerificationCode() {
+        return String.format("%06d", new Random().nextInt(999999));
     }
 }

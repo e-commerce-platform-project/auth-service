@@ -1,17 +1,14 @@
 server:
   port: 0
 
-application:
-  keycloak:
-    serverUrl: ${KEYCLOAK_URL:http://localhost:8080}
-    realmUrl: ${application.keycloak.serverUrl}/realms/${application.keycloak.realm}
-    tokenUrl: ${application.keycloak.realmUrl}/protocol/openid-connect/token
-    realm: ecommerce-platform-project
-    clientId: auth-service
-    clientSecret: RFldp0ODcs0qPUgttZp0tKzVKgFRJPno
-    adminUsername: admin
-    adminPassword: admin
-    adminClientId: admin-cli
+keycloak:
+  serverUrl: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
+  realmUrl: ${keycloak.serverUrl}/realms/${keycloak.realm}
+  tokenUrl: ${keycloak.realmUrl}/protocol/openid-connect/token
+  realm: "ecommerce-platform-project"
+  clientId: "auth-service"
+  clientSecret: "FHrfZVMlJR1uaOxK0KdQrHJ6AhOtBag4"
+
 
 spring:
   application:
@@ -23,13 +20,13 @@ spring:
       port: ${REDIS_PORT:6379}
 
 
-  security:
-    oauth2:
-      client:
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:8080/realms/ecommerce-platform-project
-            token-uri: http://localhost:8080/realms/ecommerce-platform-project/protocal/openid-connect/token
+#  security:
+#    oauth2:
+#      client:
+#        provider:
+#          keycloak:
+#            issuer-uri: http://localhost:8080/realms/ecommerce-platform-project
+#            token-uri: http://localhost:8080/realms/ecommerce-platform-project/protocal/openid-connect/token
 
 
   kafka:
@@ -41,6 +38,8 @@ spring:
         spring.json.trusted.packages: "ru.ivanov.ecommerceplatformproject.sharedlibs.event*"
 
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     healthcheck:
       enabled: true

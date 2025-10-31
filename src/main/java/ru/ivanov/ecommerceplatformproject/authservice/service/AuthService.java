@@ -1,24 +1,19 @@
 package ru.ivanov.ecommerceplatformproject.authservice.service;
 
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.RegisterUserRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.ResendVerificationCodeRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.UserLoginRequest;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.request.VerifyEmailCodeRequest;
+import ru.ivanov.ecommerceplatformproject.authservice.dto.request.VerifyEmailCodeRequest;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.TokenResponse;
+
+import java.util.Map;
 
 public interface AuthService {
     ApiResponse registerUser(RegisterUserRequest request);
 
-    TokenResponse loginUser(UserLoginRequest request);
+    Map<String, Object> loginUser(String email, String password);
 
-    void logout(String refreshToken);
+    Map<String, Object> refreshToken(String refreshToken);
 
-    TokenResponse refreshToken(String refreshToken);
+    ApiResponse resendVerificationCode(String email);
 
-    TokenResponse activateUser(ActivateUserRequest request);
-
-    ApiResponse resendVerificationCode(ResendVerificationCodeRequest request);
-
-    TokenResponse verifyEmailCode(VerifyEmailCodeRequest request);
+    Map<String, Object> verifyEmailCodeAndLogin(VerifyEmailCodeRequest request);
 }

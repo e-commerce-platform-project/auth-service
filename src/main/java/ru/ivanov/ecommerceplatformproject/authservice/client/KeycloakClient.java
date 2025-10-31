@@ -1,102 +1,31 @@
 package ru.ivanov.ecommerceplatformproject.authservice.client;
 
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-import ru.ivanov.ecommerceplatformproject.authservice.config.KeycloakProperties;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.KeycloakUserRepresentation;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.RegisteredUserDto;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.TokenRefreshRequest;
-import ru.ivanov.ecommerceplatformproject.authservice.dto.request.UserLoginRequest;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.TokenResponse;
+import org.springframework.web.bind.annotation.*;
+import ru.ivanov.ecommerceplatformproject.authservice.config.KeycloakFeignConfig;
+
+import java.util.List;
+import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
-public class KeycloakClient {
-    private static final String BEARER_PREFIX = "BEARER ";
-    private final RestTemplate restTemplate;
-    private final KeycloakProperties keycloakProperties;
+@FeignClient(
+        name = "keycloak",
+        url = "${keycloak.serverUrl}/realms/${keycloak.realm}",
+        configuration = KeycloakFeignConfig.class
+)
+public interface KeycloakClient {
 
-    private String userRegistrationUrl;
-    private String userByIdUrl;
-    private String userPasswordResetUrl;
+    @PostMapping("/users")
+    ResponseEntity<Void> createUser(@RequestBody Map<String, Object> request);
 
-    @PostConstruct
-    public void initUrls() {
-        this.userRegistrationUrl = keycloakProperties.serverUrl() + "/admin/realms/" +
-                                   keycloakProperties.realm() + "/users";
-        this.userByIdUrl = userRegistrationUrl + "/{id}";
-        this.userPasswordResetUrl = userByIdUrl + "/reset-password";
-    }
+    @GetMapping("/users")
+    List<Map<String, Object>> searchUsers(@RequestParam("email") String email);
 
+    @PutMapping("/users/{userId}")
+    void updateUser(@PathVariable("userId") String userId, @RequestBody Map<String, Object> updates);
 
-    public TokenResponse login(UserLoginRequest userLoginRequest) {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-        formData.add("email", userLoginRequest.email());
-        formData.add("password", userLoginRequest.password());
-        formData.add("client_id", keycloakProperties.clientId());
-        formData.add("grant_type", "");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(formData, headers);
-
-        ResponseEntity<TokenResponse> response = restTemplate.postForEntity(
-                "http://keycloak:8080/realms/ecommerce/protocol/openid-connect/token",
-                entity,
-                TokenResponse.class
-        );
-        return response.getBody();//todo обработка ошибок
-    }
-
-    private TokenResponse adminLogin() {
-        return null;
-    }
-
-    public TokenResponse refreshToken(TokenRefreshRequest tokenRefreshRequest) {
-        return null;
-    }
-
-    public RegisteredUserDto registerUser(String adminToken, KeycloakUserRepresentation user) {
-        return null;
-    }
-
-    public void resetUserPassword() {
-
-    }
-
-
-    public void executeOnError(String userId, String adminAccessToken, Throwable e) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(adminAccessToken);
-        headers.add(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + adminAccessToken);
-
-
-
-        HttpEntity<Void> httpEntity = new HttpEntity<>(null, headers);
-
-//        String uri = UriComponentsBuilder
-//                .fromUriString(userByIdUrl)
-//                .buildAndExpand(userId)
-//                .toUriString();
-
-        ResponseEntity<Void> response = restTemplate.exchange(
-                userByIdUrl,
-                HttpMethod.GET,
-                httpEntity,
-                Void.class,
-                userId
-        );
-
-        //todo
-
-    }
-
-    public boolean isEmailVerified(String email) {
-        return false;
-    }
+    @PostMapping("/protocol/openid-connect/token")
+    Map<String, Object> getToken(@RequestBody Map<String, String> request);
 }

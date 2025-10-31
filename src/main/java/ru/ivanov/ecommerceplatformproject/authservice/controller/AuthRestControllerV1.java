@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.ecommerceplatformproject.authservice.dto.request.*;
 import ru.ivanov.ecommerceplatformproject.authservice.service.AuthService;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.request.VerifyEmailCodeRequest;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.TokenResponse;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -20,49 +20,32 @@ public class AuthRestControllerV1 {
     private final AuthService authService;
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.ACCEPTED) //todo или CREATED
     public ApiResponse registerUser(@Valid @RequestBody RegisterUserRequest request) {
         return authService.registerUser(request);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public TokenResponse loginUser(@Valid @RequestBody UserLoginRequest request) {
-        return authService.loginUser(request);
+    public Map<String, Object> loginUser(@Valid @RequestBody LoginRequest request) {
+        return authService.loginUser(request.email(), request.password());
+    }
+
+    @PostMapping("/refresh-token")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> tokenRefresh(@Valid @RequestBody TokenRefreshRequest request) {
+        return authService.refreshToken(request.refreshToken());
     }
 
     @PostMapping("/verify-code")
     @ResponseStatus(HttpStatus.OK)
-    public TokenResponse verifyEmailCode(VerifyEmailCodeRequest request) {
-        return authService.verifyEmailCode(request);
+    public Map<String, Object> verifyEmailCode(@Valid @RequestBody VerifyEmailCodeRequest request) {
+        return authService.verifyEmailCodeAndLogin(request);
     }
 
     @PostMapping("/resend-verification-code")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ApiResponse resendVerificationCode(@Valid @RequestBody ResendVerificationCodeRequest request) {
-        return authService.resendVerificationCode(request);
-    }
-
-
-
-
-
-
-    @PostMapping("/refresh-token")
-    @ResponseStatus(HttpStatus.OK)
-    public TokenResponse tokenRefresh(@Valid @RequestBody TokenRefreshRequest request) {
-        return authService.refreshToken(request.refreshToken());
-    }
-
-    @PostMapping("/users/activate")
-    @ResponseStatus(HttpStatus.OK)
-    public TokenResponse activateUser(@Valid @RequestBody ActivateUserRequest request) {
-        return authService.activateUser(request);
-    }
-
-    @PostMapping("/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@Valid @RequestBody LogoutRequest request) {
-        authService.logout(request.refreshToken());
+        return authService.resendVerificationCode(request.email());
     }
 }
