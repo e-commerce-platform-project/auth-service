@@ -5,9 +5,9 @@ keycloak:
   serverUrl: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
   realmUrl: ${keycloak.serverUrl}/realms/${keycloak.realm}
   tokenUrl: ${keycloak.realmUrl}/protocol/openid-connect/token
-  realm: "ecommerce-platform-project"
-  clientId: "auth-service"
-  clientSecret: "FHrfZVMlJR1uaOxK0KdQrHJ6AhOtBag4"
+  realm: ecommerce-platform-project
+  clientId: auth-service
+  clientSecret: FHrfZVMlJR1uaOxK0KdQrHJ6AhOtBag4
 
 
 spring:
@@ -35,7 +35,7 @@ spring:
       acks: all
     consumer:
       properties:
-        spring.json.trusted.packages: "ru.ivanov.ecommerceplatformproject.sharedlibs.event*"
+        spring.json.trusted.packages: "ru.ivanov.ecommerceplatformproject.sharedlibs.event"
 
 eureka:
   instance:

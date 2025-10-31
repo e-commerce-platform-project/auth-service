@@ -13,7 +13,6 @@ import ru.ivanov.ecommerceplatformproject.authservice.service.NotificationServic
 import ru.ivanov.ecommerceplatformproject.authservice.service.VerificationCodeService;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.dto.response.ApiResponse;
 import ru.ivanov.ecommerceplatformproject.sharedlibs.event.UserRegisteredEvent;
-import ru.ivanov.ecommerceplatformproject.sharedlibs.event.VerificationCodeIssuedEvent;
 
 import java.util.Map;
 
