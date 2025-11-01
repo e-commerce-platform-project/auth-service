@@ -25,6 +25,7 @@ public class GlobalExceptionHandling {
                 INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now()
         );
+        ex.printStackTrace();
         return ResponseEntity
                 .status(INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)

@@ -40,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
         kafkaProducer.sendUserRegisteredEvent(userRegisteredEvent);//todo
 
         notificationService.sendVerificationCode(registeredUser.email(), verificationCode);
+        System.out.println("возвращаю ответ");
         return ApiResponse.success("User registered successfully");
     }
 

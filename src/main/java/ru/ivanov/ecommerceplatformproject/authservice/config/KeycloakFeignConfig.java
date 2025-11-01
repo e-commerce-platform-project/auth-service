@@ -34,10 +34,10 @@ public class KeycloakFeignConfig {
         };
     }
 
-    @Bean
-    public ErrorDecoder errorDecoder() {
-        return new KeycloakErrorDecoder();
-    }
+//    @Bean
+//    public ErrorDecoder errorDecoder() {
+//        return new KeycloakErrorDecoder();
+//    }
 
     private String getServiceAccessToken() {
         HttpHeaders headers = new HttpHeaders();
