@@ -26,7 +26,7 @@ public class KeycloakFeignConfig {
     @Bean
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
-            if (requestTemplate.url().startsWith("/users")) {
+            if (requestTemplate.url().startsWith("/us")) {
                 String clientToken = getServiceAccessToken();
                 requestTemplate.header(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + clientToken);
                 requestTemplate.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);

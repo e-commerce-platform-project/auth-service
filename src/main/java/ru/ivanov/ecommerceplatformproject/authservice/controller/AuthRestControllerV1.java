@@ -18,6 +18,7 @@ public class AuthRestControllerV1 {
 
     private final AuthService authService;
 
+
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse registerUser(@Valid @RequestBody RegisterUserRequest request) {

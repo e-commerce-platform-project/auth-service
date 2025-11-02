@@ -7,7 +7,7 @@ keycloak:
   tokenUrl: ${keycloak.realmUrl}/protocol/openid-connect/token
   realm: ecommerce-platform-project
   clientId: auth-service
-  clientSecret: FHrfZVMlJR1uaOxK0KdQrHJ6AhOtBag4
+  clientSecret: emYZ2tw6MKdkZ3DkE79jgmqCeSiWMKpJ
 
 
 spring:
